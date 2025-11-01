@@ -29,7 +29,7 @@ const AuthStatus = () => {
     );
   }
 
-  const displayName = user.nickname || user.phone || user.email || "用户";
+  const displayName = user.nickname || "用户";
 
   const handleLogout = async () => {
     try {
@@ -41,7 +41,7 @@ const AuthStatus = () => {
 
   return (
     <div className={styles.wrapper}>
-      <UserBadge name={displayName} alias={user.phone || user.email} />
+      <UserBadge name={displayName} />
       <button type="button" className={styles.logoutButton} onClick={handleLogout}>
         退出
       </button>

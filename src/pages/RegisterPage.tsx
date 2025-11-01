@@ -4,6 +4,7 @@ import { authService } from "@/services/authService";
 import { useAuth } from "@/context/AuthContext";
 import type { IdentifierType, RegisterRequest } from "@/types/auth";
 import styles from "./RegisterPage.module.css";
+import Select from "@/components/common/Select";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -99,21 +100,17 @@ const RegisterPage = () => {
         </div>
 
         <form className={styles.form} onSubmit={handleSubmit}>
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="identifierType">
-              注册方式
-            </label>
-            <select
-              id="identifierType"
-              className={styles.select}
-              value={identifierType}
-              onChange={event => setIdentifierType(event.target.value as IdentifierType)}
-            >
-              <option value="PHONE">手机号</option>
-              <option value="EMAIL">邮箱</option>
-              <option value="USERNAME">用户名</option>
-            </select>
-          </div>
+          <Select
+            id="identifierType"
+            label="注册方式"
+            value={identifierType}
+            onChange={val => setIdentifierType(val as IdentifierType)}
+            options={[
+              { label: "手机号", value: "PHONE" },
+              { label: "邮箱", value: "EMAIL" },
+              { label: "用户名", value: "USERNAME" }
+            ]}
+          />
 
           <div className={styles.field}>
             <label className={styles.label} htmlFor="identifier">

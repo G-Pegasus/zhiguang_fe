@@ -63,6 +63,18 @@
   color: var(--color-text-strong);
 }
 
+/* 统一下拉样式并防止箭头与文本重叠 */
+.select {
+  -webkit-appearance: none;
+  appearance: none;
+  /* 使用主题主色的自定义箭头 */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23ff8a41' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 14px;
+  padding-right: 32px;
+}
+
 .codeRow {
   display: flex;
   gap: 12px;

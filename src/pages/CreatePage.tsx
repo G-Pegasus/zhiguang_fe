@@ -1,10 +1,15 @@
 import AppLayout from "@/components/layout/AppLayout";
 import MainHeader from "@/components/layout/MainHeader";
 import SectionHeader from "@/components/common/SectionHeader";
+import Select from "@/components/common/Select";
+import { useState } from "react";
 import AuthStatus from "@/features/auth/AuthStatus";
 import styles from "./CreatePage.module.css";
 
 const CreatePage = () => {
+  const [type, setType] = useState("图文笔记");
+  const [category, setCategory] = useState("编程开发");
+  const [series, setSeries] = useState<string>("");
   return (
     <AppLayout
       header={
@@ -24,37 +29,40 @@ const CreatePage = () => {
             </label>
             <input id="title" className={styles.input} placeholder="输入内容标题" />
           </div>
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="type">
-              内容类型 *
-            </label>
-            <select id="type" className={styles.select} defaultValue="图文笔记">
-              <option value="图文笔记">图文笔记</option>
-              <option value="视频课程">视频课程</option>
-              <option value="音频课程">音频课程</option>
-            </select>
-          </div>
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="category">
-              分类 *
-            </label>
-            <select id="category" className={styles.select} defaultValue="编程开发">
-              <option value="编程开发">编程开发</option>
-              <option value="设计灵感">设计灵感</option>
-              <option value="商业增长">商业增长</option>
-              <option value="语言学习">语言学习</option>
-            </select>
-          </div>
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="series">
-              关联专栏
-            </label>
-            <select id="series" className={styles.select} defaultValue="">
-              <option value="">选择一个专栏</option>
-              <option value="coding">AI Coding 体验之旅</option>
-              <option value="product">产品实践工作坊</option>
-            </select>
-          </div>
+          <Select
+            id="type"
+            label="内容类型 *"
+            value={type}
+            onChange={setType}
+            options={[
+              { label: "图文笔记", value: "图文笔记" },
+              { label: "视频课程", value: "视频课程" },
+              { label: "音频课程", value: "音频课程" }
+            ]}
+          />
+          <Select
+            id="category"
+            label="分类 *"
+            value={category}
+            onChange={setCategory}
+            options={[
+              { label: "编程开发", value: "编程开发" },
+              { label: "设计灵感", value: "设计灵感" },
+              { label: "商业增长", value: "商业增长" },
+              { label: "语言学习", value: "语言学习" }
+            ]}
+          />
+          <Select
+            id="series"
+            label="关联专栏"
+            value={series}
+            onChange={setSeries}
+            options={[
+              { label: "选择一个专栏", value: "" },
+              { label: "AI Coding 体验之旅", value: "coding" },
+              { label: "产品实践工作坊", value: "product" }
+            ]}
+          />
           <div className={`${styles.field} ${styles.fullWidth}`}>
             <label className={styles.label}>图片（多选） *</label>
             <div className={styles.uploadBox}>

@@ -5,12 +5,6 @@ import type { LoginRequest } from "@/types/auth";
 import { authService } from "@/services/authService";
 import styles from "./LoginPage.module.css";
 
-const identifierOptions = [
-  { label: "手机号", value: "PHONE" },
-  { label: "用户名", value: "USERNAME" },
-  { label: "邮箱", value: "EMAIL" }
-] as const;
-
 type LocationState = {
   from?: string;
 };
@@ -19,10 +13,7 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, isLoading, user } = useAuth();
-  const [identifierType, setIdentifierType] = useState<LoginRequest["identifierType"]>("USERNAME");
   const [identifier, setIdentifier] = useState("");
-  const [password, setPassword] = useState("");
-  const [loginMethod, setLoginMethod] = useState<"PASSWORD" | "CODE">("PASSWORD");
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -49,10 +40,7 @@ const LoginPage = () => {
     setSubmitting(true);
 
     try {
-      const payload: LoginRequest =
-        loginMethod === "PASSWORD"
-          ? { identifierType, identifier, password }
-          : { identifierType, identifier, code };
+      const payload: LoginRequest = { identifierType: "PHONE", identifier, code };
       await login(payload);
       navigate(from, { replace: true });
     } catch (err) {
@@ -73,7 +61,7 @@ const LoginPage = () => {
     try {
       const response = await authService.sendCode({
         scene: "LOGIN",
-        identifierType,
+        identifierType: "PHONE",
         identifier
       });
       setCountdown(Math.max(1, response.expireSeconds ?? 300));
@@ -85,7 +73,7 @@ const LoginPage = () => {
     }
   };
 
-  const isDisabled = submitting || !identifier || (loginMethod === "PASSWORD" ? !password : !code);
+  const isDisabled = submitting || !identifier || !code;
 
   return (
     <div className={styles.page}>
@@ -96,42 +84,11 @@ const LoginPage = () => {
         </div>
 
         <form className={styles.form} onSubmit={handleSubmit}>
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="identifierType">
-              账号类型
-            </label>
-            <select
-              id="identifierType"
-              className={styles.select}
-              value={identifierType}
-              onChange={event => setIdentifierType(event.target.value as LoginRequest["identifierType"])}
-            >
-              {identifierOptions.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="loginMethod">
-              登录方式
-            </label>
-            <select
-              id="loginMethod"
-              className={styles.select}
-              value={loginMethod}
-              onChange={event => setLoginMethod(event.target.value as "PASSWORD" | "CODE")}
-            >
-              <option value="PASSWORD">密码登录</option>
-              <option value="CODE">验证码登录</option>
-            </select>
-          </div>
+          {/* 只保留手机号 + 验证码登录，不提供选择 */}
 
           <div className={styles.field}>
             <label className={styles.label} htmlFor="identifier">
-              {identifierType === "PHONE" ? "手机号" : identifierType === "EMAIL" ? "邮箱" : "用户名"}
+              手机号
             </label>
             <input
               id="identifier"
@@ -139,52 +96,34 @@ const LoginPage = () => {
               value={identifier}
               onChange={event => setIdentifier(event.target.value)}
               placeholder="请输入账号"
-              type={identifierType === "PHONE" ? "tel" : identifierType === "EMAIL" ? "email" : "text"}
-              autoComplete={identifierType === "PHONE" ? "tel" : identifierType === "EMAIL" ? "email" : "username"}
+              type="tel"
+              autoComplete="tel"
             />
           </div>
-
-          {loginMethod === "PASSWORD" ? (
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="password">
-                密码
-              </label>
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="code">
+              验证码
+            </label>
+            <div className={styles.codeRow}>
               <input
-                id="password"
+                id="code"
                 className={styles.input}
-                type="password"
-                value={password}
-                onChange={event => setPassword(event.target.value)}
-                placeholder="请输入密码"
-                autoComplete="current-password"
+                value={code}
+                onChange={event => setCode(event.target.value)}
+                placeholder="请输入验证码"
+                autoComplete="one-time-code"
               />
+              <button
+                type="button"
+                className={styles.codeButton}
+                disabled={sendingCode || countdown > 0}
+                onClick={handleSendCode}
+              >
+                {countdown > 0 ? `${countdown}s` : "获取验证码"}
+              </button>
             </div>
-          ) : (
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="code">
-                验证码
-              </label>
-              <div className={styles.codeRow}>
-                <input
-                  id="code"
-                  className={styles.input}
-                  value={code}
-                  onChange={event => setCode(event.target.value)}
-                  placeholder="请输入验证码"
-                  autoComplete="one-time-code"
-                />
-                <button
-                  type="button"
-                  className={styles.codeButton}
-                  disabled={sendingCode || countdown > 0}
-                  onClick={handleSendCode}
-                >
-                  {countdown > 0 ? `${countdown}s` : "获取验证码"}
-                </button>
-              </div>
-              <span className={styles.tips}>验证码用于校验登录，不需要输入密码。</span>
-            </div>
-          )}
+            <span className={styles.tips}>验证码用于校验登录，不需要输入密码。</span>
+          </div>
 
           {error ? <div className={styles.error}>{error}</div> : null}
 

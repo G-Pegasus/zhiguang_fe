@@ -1,7 +1,6 @@
 import type { ContentItem, SearchSuggestion } from "@/types/content";
 
 export const categories = [
-  "全部",
   "编程",
   "设计",
   "商业",

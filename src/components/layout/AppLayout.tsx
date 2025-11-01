@@ -14,9 +14,7 @@ const AppLayout = ({ header, children, variant = "default" }: AppLayoutProps) =>
       <Sidebar />
       <div className={styles.container}>
         {header}
-        <div className={variant === "default" ? styles.pageCard : styles.main}>
-          <div className={styles.content}>{children}</div>
-        </div>
+        <div className={variant === "default" ? styles.pageCard : styles.main}>{children}</div>
       </div>
     </div>
   );

@@ -51,8 +51,8 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;
-  /* 为顶部绝对定位的免费徽章预留空间，避免与标题重叠 */
-  margin-top: 28px;
+  /* 取消免费徽章后，移除额外的上边距 */
+  margin-top: 0;
 }
 
 .title {
@@ -127,8 +127,12 @@
 .cover {
   width: 100%;
   border-radius: 18px;
-  object-fit: cover;
-  max-height: 180px;
+  height: auto;
+  display: block;
+}
+
+.coverWrap {
+  position: relative;
 }
 
 .variantHorizontal {
@@ -144,16 +148,17 @@
 
 .playBadge {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  width: 38px;
-  height: 38px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 44px;
+  height: 44px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.86);
+  background: rgba(255, 255, 255, 0.88);
   display: grid;
   place-items: center;
   color: var(--color-primary-strong);
-  box-shadow: inset 0 0 0 1px rgba(255, 138, 65, 0.2);
+  box-shadow: inset 0 0 0 1px rgba(255, 138, 65, 0.22), 0 10px 24px rgba(26, 26, 44, 0.12);
 }
 
 @media (max-width: 1100px) {

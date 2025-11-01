@@ -43,32 +43,29 @@ const CourseCard = ({
 }: CourseCardProps) => {
   const content = (
     <>
-      {isFree ? (
-        <div className={styles.badge}>
-          <span>免费</span>
-        </div>
-      ) : null}
-      {showPlayBadge ? (
-        <div className={styles.playBadge}>
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M5.4 3.8a1 1 0 0 0-1.6.8v6.8a1 1 0 0 0 1.6.8l5.6-3.4a1 1 0 0 0 0-1.6z" fill="currentColor" />
-          </svg>
+      {/* 取消免费标识展示，保持卡片简洁 */}
+      {/* 图片置于卡片顶部，保持原始比例；播放标识覆盖在封面中央 */}
+      {coverImage ? (
+        <div className={styles.coverWrap}>
+          <img className={styles.cover} src={coverImage} alt={title} loading="lazy" />
+          {showPlayBadge ? (
+            <div className={styles.playBadge}>
+              <svg width="24" height="24" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <polygon points="6,4 12,8 6,12" fill="currentColor" />
+              </svg>
+            </div>
+          ) : null}
         </div>
       ) : null}
 
-      <div className={`${styles.content} ${layout === "horizontal" ? styles.variantHorizontal : ""}`}>
-        <div className={layout === "horizontal" ? styles.variantHorizontalText : undefined}>
-          <h3 className={styles.title}>{title}</h3>
-          <p className={styles.description}>{summary}</p>
-          <div className={styles.tagGroups}>
-            {tags.map(tag => (
-              <Tag key={tag}>#{tag}</Tag>
-            ))}
-          </div>
+      <div className={styles.content}>
+        <h3 className={styles.title}>{title}</h3>
+        <p className={styles.description}>{summary}</p>
+        <div className={styles.tagGroups}>
+          {tags.map(tag => (
+            <Tag key={tag}>#{tag}</Tag>
+          ))}
         </div>
-        {coverImage ? (
-          <img className={styles.cover} src={coverImage} alt={title} loading="lazy" />
-        ) : null}
       </div>
 
       <div className={styles.meta}>
