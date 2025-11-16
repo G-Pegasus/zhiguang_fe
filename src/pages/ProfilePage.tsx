@@ -8,7 +8,9 @@ import { useAuth } from "@/context/AuthContext";
 import styles from "./ProfilePage.module.css";
 import feedStyles from "./HomePage.module.css";
 import CourseCard from "@/components/cards/CourseCard";
+import LikeFavBar from "@/components/common/LikeFavBar";
 import { knowpostService } from "@/services/knowpostService";
+import RelationCounters from "@/components/common/RelationCounters";
 
 const ProfilePage = () => {
   const { user, tokens } = useAuth();
@@ -42,35 +44,39 @@ const ProfilePage = () => {
     authorAvatar?: string;
     authorAvator?: string;
     authorNickname: string;
+    likeCount?: number;
+    favoriteCount?: number;
+    liked?: boolean;
+    faved?: boolean;
+    isTop?: boolean;
   }>>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // 抽取成单一函数，供首次加载与编辑动作后复用
+  const reloadMine = async () => {
+    if (!tokens?.accessToken) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const resp = await knowpostService.mine(1, 20, tokens.accessToken);
+      setItems(resp.items ?? []);
+      setHasMore(!!resp.hasMore);
+      setPage(resp.page ?? 1);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "加载失败";
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    let cancelled = false;
-    const run = async () => {
-      if (!tokens?.accessToken) return; // 未登录不请求
-      setLoading(true);
-      setError(null);
-      try {
-        const resp = await knowpostService.mine(1, 20, tokens.accessToken);
-        if (!cancelled) {
-          setItems(resp.items ?? []);
-          setHasMore(!!resp.hasMore);
-          setPage(resp.page ?? 1);
-        }
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : "加载失败";
-        if (!cancelled) setError(msg);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-    run();
-    return () => { cancelled = true; };
+    void reloadMine();
   }, [tokens?.accessToken]);
+
 
   return (
     <AppLayout
@@ -109,6 +115,13 @@ const ProfilePage = () => {
         </div>
         <div className={styles.bioBlock}>{user?.bio ?? "暂无简介"}</div>
 
+        {/* 关系计数展示 */}
+        {user?.id ? (
+          <div style={{ marginTop: 8 }}>
+            <RelationCounters userId={user.id} />
+          </div>
+        ) : null}
+
         <SectionHeader title="我的知文" subtitle="仅显示你已发布的知文" />
         {error ? <div style={{ color: "var(--color-danger)" }}>{error}</div> : null}
         {!user ? (
@@ -122,6 +135,7 @@ const ProfilePage = () => {
                   title={item.title}
                   summary={item.description ?? ""}
                   tags={item.tags ?? []}
+                  isTop={item.isTop}
                   authorTags={(() => {
                     try {
                       return item.tagJson ? (JSON.parse(item.tagJson) as unknown[]).filter((t) => typeof t === "string") as string[] : [];
@@ -132,7 +146,16 @@ const ProfilePage = () => {
                   teacher={{ name: item.authorNickname, avatarUrl: item.authorAvatar ?? item.authorAvator }}
                   coverImage={item.coverImage}
                   to={`/post/${item.id}`}
-                />
+                  editable
+                  onChanged={(action) => {
+                    if (action === "delete") {
+                      setItems(prev => prev.filter(x => x.id !== item.id));
+                    } else {
+                      void reloadMine();
+                    }
+                  }}
+              footerExtra={<LikeFavBar entityId={item.id} compact initialCounts={{ like: item.likeCount ?? 0, fav: item.favoriteCount ?? 0 }} initialState={{ liked: item.liked, faved: item.faved }} />}
+            />
               </div>
             ))}
             {loading ? <div className={feedStyles.masonryItem}><div>加载中…</div></div> : null}

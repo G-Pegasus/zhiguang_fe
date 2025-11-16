@@ -19,7 +19,6 @@ export type RegisterRequest = {
   identifier: string;
   code: string;
   password: string;
-  nickname: string;
   agreeTerms: boolean;
 };
 

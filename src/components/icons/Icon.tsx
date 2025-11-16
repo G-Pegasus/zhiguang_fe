@@ -74,3 +74,9 @@ export const HeartIcon = createIcon(
     <path d="M12 19c-4.8-2.7-7.5-5.6-7.5-9a4.5 4.5 0 0 1 8.2-2.4h.6A4.5 4.5 0 0 1 19.5 10c0 3.4-2.7 6.3-7.5 9z" />
   </>
 );
+
+export const BookmarkIcon = createIcon(
+  <>
+    <path d="M7.5 4h9a1 1 0 0 1 1 1v14l-5.5-3.5L6.5 19V5a1 1 0 0 1 1-1z" />
+  </>
+);

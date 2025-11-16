@@ -12,11 +12,13 @@ import { useAuth } from "@/context/AuthContext";
 import type { KnowpostDetailResponse } from "@/types/knowpost";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import LikeFavBar from "@/components/common/LikeFavBar";
+import FollowButton from "@/components/common/FollowButton";
 
 const CourseDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { tokens } = useAuth();
+  const { tokens, user } = useAuth();
   const [detail, setDetail] = useState<KnowpostDetailResponse | null>(null);
   const [activeImage, setActiveImage] = useState(0);
   const [contentText, setContentText] = useState<string>("");
@@ -30,6 +32,12 @@ const CourseDetailPage = () => {
   const [showNavLeft, setShowNavLeft] = useState(false);
   const [showNavRight, setShowNavRight] = useState(false);
   const [isTouch, setIsTouch] = useState(false);
+  // 从头像 URL 推断作者 ID（示例：.../avatars/3-xxxx.jpg → 3）
+  const parseAvatarUserId = (url?: string): number | undefined => {
+    if (!url) return undefined;
+    const m = url.match(/\/avatars\/(\d+)-/);
+    return m ? Number(m[1]) : undefined;
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -162,9 +170,14 @@ const CourseDetailPage = () => {
           <div className={styles.titleRow}></div>
           <div className={styles.meta}>
             {detail?.authorAvatar ? (
-              <img src={detail.authorAvatar} alt={detail.authorNickname} style={{ width: 28, height: 28, borderRadius: 10, objectFit: "cover" }} />
+              <img className={styles.authorAvatar} src={detail.authorAvatar} alt={detail.authorNickname} />
             ) : null}
-            <span>{detail?.authorNickname ?? ""}</span>
+            <span className={styles.authorName}>{detail?.authorNickname ?? ""}</span>
+            {(() => {
+              const derivedId = detail?.authorId ?? parseAvatarUserId(detail?.authorAvatar);
+              const isSelf = (derivedId && user?.id === derivedId) || (!!detail?.authorNickname && !!user?.nickname && detail.authorNickname === user.nickname);
+              return derivedId && !isSelf ? <FollowButton targetUserId={derivedId} /> : null;
+            })()}
           </div>
           <div className={styles.tagList}>
             {(detail?.tags ?? []).map(tag => (
@@ -175,10 +188,15 @@ const CourseDetailPage = () => {
             {detail?.publishTime ? (
               <span>{new Date(detail.publishTime).toLocaleDateString("zh-CN")}</span>
             ) : null}
-            <div className={styles.stats}>
-              <span>👍 {detail?.likeCount ?? 0}</span>
-              <span>⭐ {detail?.favoriteCount ?? 0}</span>
-            </div>
+          </div>
+          <div className={styles.bottomBar}>
+            {detail ? (
+              <LikeFavBar
+                entityId={detail.id}
+                initialCounts={{ like: detail.likeCount ?? 0, fav: detail.favoriteCount ?? 0 }}
+                initialState={{ liked: detail.liked, faved: detail.faved }}
+              />
+            ) : null}
           </div>
         </div>
 

@@ -29,22 +29,25 @@
   box-shadow: 0 24px 48px rgba(26, 26, 44, 0.12);
 }
 
-.badge {
+.topBadge {
   position: absolute;
-  top: 20px;
-  left: 20px;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+  pointer-events: none;
 }
 
-.badge span {
+.topBadge span {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   padding: 4px 10px;
   border-radius: 999px;
-  background: rgba(18, 192, 123, 0.16);
-  color: #0f8a5c;
+  background: var(--color-primary-strong);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(26, 26, 44, 0.12);
 }
 
 .content {
@@ -144,6 +147,12 @@
   gap: 6px;
 }
 
+.footerExtra {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
 .cover {
   width: 100%;
   border-radius: 18px;
@@ -180,6 +189,54 @@
   color: var(--color-primary-strong);
   box-shadow: inset 0 0 0 1px rgba(255, 138, 65, 0.22), 0 10px 24px rgba(26, 26, 44, 0.12);
 }
+
+/* 右上角编辑菜单入口 */
+.menuButton {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: rgba(26, 26, 44, 0.06);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  z-index: 5;
+  border: none;
+  outline: none;
+}
+.menuButton:hover { background: rgba(26, 26, 44, 0.12); color: var(--color-text-strong); }
+.menuButton:focus { box-shadow: 0 0 0 2px rgba(255, 138, 65, 0.28); }
+
+.menuList {
+  position: absolute;
+  top: 44px;
+  right: 12px;
+  min-width: 160px;
+  background: var(--color-surface);
+  border-radius: 12px;
+  box-shadow: 0 12px 28px rgba(26, 26, 44, 0.12);
+  border: 1px solid rgba(26, 26, 44, 0.08);
+  padding: 6px;
+  z-index: 10;
+}
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  font-size: 13px;
+  color: var(--color-text-strong);
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+}
+.menuItem:hover { background: rgba(255, 138, 65, 0.08); }
+.menuDanger { color: var(--color-danger); }
 
 @media (max-width: 1100px) {
   .variantHorizontal {

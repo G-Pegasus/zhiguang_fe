@@ -44,6 +44,12 @@ export type FeedItem = {
   tags: string[];
   authorAvatar?: string; // 后端字段名为 authorAvatar
   authorNickname: string;
+  likeCount?: number;
+  favoriteCount?: number;
+  liked?: boolean;
+  faved?: boolean;
+  isTop?: boolean;
+  visible?: VisibleScope;
 };
 
 export type FeedResponse = {
@@ -63,11 +69,36 @@ export type KnowpostDetailResponse = {
   tags: string[];
   authorAvatar?: string;
   authorNickname: string;
+  authorId?: number;
   authorTagJson?: string;
   likeCount: number;
   favoriteCount: number;
+  liked?: boolean;
+  faved?: boolean;
   isTop: boolean;
   visible: "public" | "followers" | "school" | "private" | "unlisted";
   type: "image_text" | string;
   publishTime?: string;
+};
+
+// 点赞/取消点赞 响应
+export type LikeActionResponse = {
+  changed: boolean;
+  liked: boolean;
+};
+
+// 收藏/取消收藏 响应
+export type FavActionResponse = {
+  changed: boolean;
+  faved: boolean;
+};
+
+// 计数查询响应
+export type CounterResponse = {
+  entityType: string;
+  entityId: string;
+  counts: {
+    like: number;
+    fav: number;
+  };
 };

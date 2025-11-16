@@ -14,7 +14,6 @@ const RegisterPage = () => {
   const [identifier, setIdentifier] = useState("");
   const [code, setCode] = useState("");
   const [password, setPassword] = useState("");
-  const [nickname, setNickname] = useState("");
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -46,13 +45,13 @@ const RegisterPage = () => {
     setMessage(null);
     setSendingCode(true);
     try {
-      const response = await authService.sendCode({
+      await authService.sendCode({
         scene: "REGISTER",
         identifier,
         identifierType
       });
       setMessage("验证码已发送，请注意查收");
-      setCountdown(Math.max(1, response.expireSeconds ?? 300));
+      setCountdown(60);
     } catch (err) {
       const info = err instanceof Error ? err.message : "验证码发送失败";
       setError(info);
@@ -72,7 +71,6 @@ const RegisterPage = () => {
         identifier,
         code,
         password,
-        nickname,
         agreeTerms
       };
       await register(payload);
@@ -90,7 +88,7 @@ const RegisterPage = () => {
     }
   };
 
-  const isDisabled = submitting || !identifier || !code || !password || !nickname || !agreeTerms;
+  const isDisabled = submitting || !identifier || !code || !password || !agreeTerms;
 
   return (
     <div className={styles.page}>
@@ -155,19 +153,7 @@ const RegisterPage = () => {
             />
           </div>
 
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="nickname">
-              昵称
-            </label>
-            <input
-              id="nickname"
-              className={styles.input}
-              value={nickname}
-              onChange={event => setNickname(event.target.value)}
-              placeholder="如何称呼你"
-              autoComplete="nickname"
-            />
-          </div>
+          
 
           <div className={styles.field}>
             <div className={styles.checkboxRow}>

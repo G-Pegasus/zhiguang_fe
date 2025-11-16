@@ -43,9 +43,28 @@
   color: var(--color-text-muted);
 }
 
+.authorAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.authorName {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-strong);
+}
+
 .stats {
   display: flex;
   gap: 18px;
+}
+
+.bottomBar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 .tagList {

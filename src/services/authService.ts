@@ -47,6 +47,8 @@ export const authService = {
   refresh: (refreshToken: string) =>
     apiFetch<RefreshResponse>(`${AUTH_PREFIX}/token/refresh`, {
       method: "POST",
-      body: { refreshToken }
+      body: { refreshToken },
+      // 刷新接口不应携带（已过期的）access token
+      accessToken: null
     })
 };

@@ -6,7 +6,11 @@ import type {
   ConfirmContentRequest,
   UpdateKnowPostRequest,
   FeedResponse,
-  KnowpostDetailResponse
+  KnowpostDetailResponse,
+  LikeActionResponse,
+  FavActionResponse,
+  CounterResponse,
+  VisibleScope
 } from "@/types/knowpost";
 
 const KNOWPOST_PREFIX = "/api/v1/knowposts";
@@ -27,6 +31,32 @@ export const knowpostService = {
 
   publish: (id: string) =>
     apiFetch<void>(`${KNOWPOST_PREFIX}/${id}/publish`, { method: "POST" })
+  ,
+  
+  // 设置置顶（需鉴权）
+  setTop: (id: string, isTop: boolean, accessToken: string) =>
+    apiFetch<void>(`${KNOWPOST_PREFIX}/${id}/top`, {
+      method: "PATCH",
+      body: { isTop },
+      accessToken
+    })
+  ,
+
+  // 设置可见性（需鉴权）
+  setVisibility: (id: string, visible: VisibleScope, accessToken: string) =>
+    apiFetch<void>(`${KNOWPOST_PREFIX}/${id}/visibility`, {
+      method: "PATCH",
+      body: { visible },
+      accessToken
+    })
+  ,
+
+  // 删除知文（需鉴权）
+  remove: (id: string, accessToken: string) =>
+    apiFetch<void>(`${KNOWPOST_PREFIX}/${id}`, {
+      method: "DELETE",
+      accessToken
+    })
   ,
 
   // 获取首页 Feed 列表（公开内容）
@@ -53,6 +83,45 @@ export const knowpostService = {
     apiFetch<{ description: string }>(`${KNOWPOST_PREFIX}/description/suggest`, {
       method: "POST",
       body: { content },
+      accessToken
+    })
+  ,
+
+  // 点赞/取消点赞（需鉴权）
+  like: (entityId: string, accessToken: string, entityType: string = "knowpost") =>
+    apiFetch<LikeActionResponse>(`/api/v1/action/like`, {
+      method: "POST",
+      body: { entityType, entityId },
+      accessToken
+    })
+  ,
+  unlike: (entityId: string, accessToken: string, entityType: string = "knowpost") =>
+    apiFetch<LikeActionResponse>(`/api/v1/action/unlike`, {
+      method: "POST",
+      body: { entityType, entityId },
+      accessToken
+    })
+  ,
+
+  // 收藏/取消收藏（需鉴权）
+  fav: (entityId: string, accessToken: string, entityType: string = "knowpost") =>
+    apiFetch<FavActionResponse>(`/api/v1/action/fav`, {
+      method: "POST",
+      body: { entityType, entityId },
+      accessToken
+    })
+  ,
+  unfav: (entityId: string, accessToken: string, entityType: string = "knowpost") =>
+    apiFetch<FavActionResponse>(`/api/v1/action/unfav`, {
+      method: "POST",
+      body: { entityType, entityId },
+      accessToken
+    })
+  ,
+
+  // 获取计数（需鉴权）
+  counters: (entityId: string, accessToken: string, entityType: string = "knowpost") =>
+    apiFetch<CounterResponse>(`/api/v1/counter/${entityType}/${entityId}?metrics=like,fav`, {
       accessToken
     })
 };

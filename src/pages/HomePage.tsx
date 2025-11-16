@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import AppLayout from "@/components/layout/AppLayout";
 import MainHeader from "@/components/layout/MainHeader";
 import CourseCard from "@/components/cards/CourseCard";
+import LikeFavBar from "@/components/common/LikeFavBar";
 import { knowpostService } from "@/services/knowpostService";
 import AuthStatus from "@/features/auth/AuthStatus";
 import styles from "./HomePage.module.css";
@@ -17,6 +18,10 @@ const HomePage = () => {
     authorAvatar?: string;
     authorAvator?: string;
     authorNickname: string;
+    likeCount?: number;
+    favoriteCount?: number;
+    liked?: boolean;
+    faved?: boolean;
   }>>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -72,6 +77,7 @@ const HomePage = () => {
               teacher={{ name: item.authorNickname, avatarUrl: item.authorAvatar ?? item.authorAvator }}
               coverImage={item.coverImage}
                 to={`/post/${item.id}`}
+              footerExtra={<LikeFavBar entityId={item.id} compact initialCounts={{ like: item.likeCount ?? 0, fav: item.favoriteCount ?? 0 }} initialState={{ liked: item.liked, faved: item.faved }} />}
             />
           </div>
         ))}
