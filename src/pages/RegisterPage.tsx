@@ -1,10 +1,24 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { authService } from "@/services/authService";
+import { ApiError } from "@/services/apiClient";
 import { useAuth } from "@/context/AuthContext";
+import { validatePassword } from "@/features/auth/passwordPolicy";
 import type { IdentifierType, RegisterRequest } from "@/types/auth";
 import styles from "./RegisterPage.module.css";
 // 注册方式固定为手机号
+
+/**
+ * 从接口错误中取出后端业务错误码（如 VERIFICATION_NOT_FOUND）。
+ * 后端统一返回 { code, message }，apiClient 只把 message 作为 Error.message 抛出，
+ * 因此这里从 data 中读取 code 做稳定分支。
+ */
+const getErrorCode = (error: unknown): string | undefined => {
+  if (error instanceof ApiError && typeof error.data === "object" && error.data !== null && "code" in error.data) {
+    return (error.data as { code?: string }).code;
+  }
+  return undefined;
+};
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -15,6 +29,7 @@ const RegisterPage = () => {
   const [code, setCode] = useState("");
   const [password, setPassword] = useState("");
   const [agreeTerms, setAgreeTerms] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -64,6 +79,15 @@ const RegisterPage = () => {
     event.preventDefault();
     setError(null);
     setMessage(null);
+
+    // 密码策略就地校验：不满足时不发起请求，验证码（一次性凭证）就不会被提前消费。
+    const policy = validatePassword(password);
+    if (!policy.ok) {
+      setPasswordError(policy.message);
+      return;
+    }
+    setPasswordError(null);
+
     setSubmitting(true);
     try {
       const payload: RegisterRequest = {
@@ -82,7 +106,15 @@ const RegisterPage = () => {
       }, 400);
     } catch (err) {
       const info = err instanceof Error ? err.message : "注册失败，请稍后重试";
-      setError(info);
+      const errorCode = getErrorCode(err);
+      if (errorCode === "VERIFICATION_NOT_FOUND") {
+        setError("验证码已失效或已被使用，请重新获取验证码");
+      } else if (errorCode === "PASSWORD_POLICY_VIOLATION") {
+        // 后端策略与前端不一致时（例如后端调整了最小长度），把提示落到密码框下方
+        setPasswordError(info);
+      } else {
+        setError(info);
+      }
     } finally {
       setSubmitting(false);
     }
@@ -144,13 +176,29 @@ const RegisterPage = () => {
             </label>
             <input
               id="password"
-              className={styles.input}
+              className={`${styles.input} ${passwordError ? styles.inputInvalid : ""}`}
               type="password"
               value={password}
-              onChange={event => setPassword(event.target.value)}
+              onChange={event => {
+                setPassword(event.target.value);
+                if (passwordError) {
+                  setPasswordError(null);
+                }
+              }}
               placeholder="请设置不少于 8 位的密码"
               autoComplete="new-password"
+              aria-invalid={passwordError ? true : undefined}
+              aria-describedby={passwordError ? "password-error" : "password-tips"}
             />
+            {passwordError ? (
+              <span id="password-error" className={styles.fieldError} role="alert">
+                {passwordError}
+              </span>
+            ) : (
+              <span id="password-tips" className={styles.tips}>
+                至少 8 位，需同时包含字母和数字。
+              </span>
+            )}
           </div>
 
           

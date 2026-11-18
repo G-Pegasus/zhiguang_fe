@@ -149,6 +149,16 @@
   color: var(--color-text-muted);
 }
 
+/* 字段级错误：比整表错误更靠近出错控件，避免与顶部提示重复 */
+.fieldError {
+  font-size: 12px;
+  color: #ff4b4b;
+}
+
+.inputInvalid {
+  box-shadow: inset 0 0 0 1px rgba(255, 75, 75, 0.65);
+}
+
 .checkboxRow {
   display: flex;
   align-items: center;
